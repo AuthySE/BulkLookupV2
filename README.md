@@ -6,8 +6,8 @@
     1. Put in the appropriate value.
 1. Execute npm install
 1. `source demo.env`
-1. Put source phone numbers into a csv file.  1 column of numbers. (e.g. 12024561111)
-1. Execute `node bulkLookup.js input.csv`
+1. Put source phone numbers into a csv file (e.g. input.csv).  1 column of numbers. (e.g. +12024561111)
+1. Execute the script with the input file `node bulkLookup.js input.csv`
 
 ## Output
 Found information:
