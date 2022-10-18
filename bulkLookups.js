@@ -35,7 +35,7 @@ var errorStream = fs.createWriteStream('errors-' + lookupType + '.csv');
 
 var errorList = [];
 
-var uriSuffix = (lookupType === "line_type_intelligence") ? '?Fields=line_type_intelligence' : '?Type=caller-name';
+var uriSuffix = (lookupType === "line_type_intelligence") ? '?Fields=line_type_intelligence' : '?Type=sim_swap';
 if (lookupType === "line_type_intelligence" && bulkCSVHeaders) {
     stream.write("phone_number, carrier_name, carrier_type, mcc, mnc, country_code\n");
 } 
