@@ -2,7 +2,7 @@
 # Bulk Lookups for Twilio Lookup
 
 1. Add TWILIO SID and AUTH TOKEN to demo.env
-1. Do you want to do `Line Type Intelligence` or `Sim Swap` Lookups? //currently only Line Type is supported in this Bulk Lookup Script
+1. Do you want to do `Line Type Intelligence`, `Caller Name`, or `Validation` Lookups?
     1. Put in the appropriate value.
 1. Execute npm install
 1. `source demo.env`
