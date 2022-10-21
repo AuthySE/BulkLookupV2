@@ -35,10 +35,23 @@ var errorStream = fs.createWriteStream('errors-' + lookupType + '.csv');
 
 var errorList = [];
 
-var uriSuffix = (lookupType === "line_type_intelligence") ? '?Fields=line_type_intelligence' : '?Type=sim_swap';
+var uriSuffix;
+if (lookupType === "line_type_intelligence")
+    uriSuffix = "?Fields=line_type_intelligence";
+else if (lookupType === "caller_name")
+    uriSuffix = "?Fields=caller_name";
+else if (lookupType === "validation")
+    uriSuffix = "?Fields=validation";
+
 if (lookupType === "line_type_intelligence" && bulkCSVHeaders) {
     stream.write("phone_number, carrier_name, carrier_type, mcc, mnc, country_code\n");
-} 
+}
+if (lookupType === "caller_name" && bulkCSVHeaders) {
+    stream.write("phone_number,caller_name,caller_type\n");
+}
+if (lookupType === "validation" && bulkCSVHeaders) {
+    stream.write("phone_number, calling_country_code, national_format, country_code\n");
+}
 
 var q = async.queue(function (task, callback) {
 
@@ -60,10 +73,39 @@ var q = async.queue(function (task, callback) {
 
             
           if (lookupType === "line_type_intelligence") {
-                if (response.line_type_intelligence.carrier_name) {
-                    var carrierName = response.line_type_intelligence.carrier_name.replace(",", "");
+                if (!response.valid) {
+                    console.log("Invalid number: ", task.phoneNumber);
+                    errorStream.write(task.phoneNumber + ": Invalid Number"  + "\n");
                 }
-                stream.write(response.phone_number + ',' + response.line_type_intelligence.carrier_name + ',' + response.line_type_intelligence.type + ',' + response.line_type_intelligence.mobile_country_code + ',' + response.line_type_intelligence.mobile_network_code + ',' + response.country_code + '\n');
+                else if(response.line_type_intelligence.carrier_name == null) {
+                    console.log("error with this number: ", task.phoneNumber);
+                    errorStream.write(task.phoneNumber + response.line_type_intelligence.error_code  + "\n");  
+                }
+                else if (response.line_type_intelligence.carrier_name) {
+                    var carrierName = response.line_type_intelligence.carrier_name.replace(",", "");
+                    stream.write(response.phone_number + ',' + response.line_type_intelligence.carrier_name + ',' + response.line_type_intelligence.type + ',' + response.line_type_intelligence.mobile_country_code + ',' + response.line_type_intelligence.mobile_network_code + ',' + response.country_code + '\n');
+                }                
+            }
+          else if (lookupType === "caller_name") {
+                if (!response.valid) {
+                    console.log("Invalid number: ", task.phoneNumber);
+                    errorStream.write(task.phoneNumber + ": Invalid Number"  + "\n");
+                }
+                else {
+                    if (response.caller_name.caller_name) {
+                        var caller_name = response.caller_name.caller_name.replace(",", "");
+                    }
+                    stream.write(response.phone_number + ',' + caller_name + ',' + response.caller_name.caller_type + '\n');
+                }
+            }
+          else if (lookupType === "validation") {
+                if(response.valid) {
+                    stream.write(response.phone_number + ',' + response.calling_country_code + ',' + response.national_format + ',' + response.country_code + '\n');   
+                }
+                else {
+                    console.log("Invalid number: ", task.phoneNumber);
+                    errorStream.write(task.phoneNumber + ": Invalid Number"  + "\n");
+                }
             }
             callback();
 
